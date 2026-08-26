@@ -2,16 +2,16 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
-import api from "@/lib/api";
 
 const AuthContext = createContext(null);
+
+const STRAPI_URL = "http://localhost:1337";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Page refresh -> user from cookie
     const savedUser = Cookies.get("user");
     if (savedUser) {
       try {
@@ -24,18 +24,28 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (identifier, password) => {
-    // Login in Strapi
-    const res = await api.post("/auth/local", { identifier, password });
-    const { jwt, user: userData } = res.data;
+    // Step 1: Login
+    const loginRes = await fetch(`${STRAPI_URL}/api/auth/local`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ identifier, password }),
+    });
 
-    // Get user data with role
-    const roleRes = await api.get("/users/me?populate=role", {
+    if (!loginRes.ok) {
+      throw new Error("Login failed");
+    }
+
+    const loginData = await loginRes.json();
+    const { jwt, user: userData } = loginData;
+
+    // Step 2: user with role
+    const meRes = await fetch(`${STRAPI_URL}/api/users/me?populate=role`, {
       headers: { Authorization: `Bearer ${jwt}` },
     });
 
-    const fullUser = roleRes.data;
+    const fullUser = await meRes.json();
 
-    // Save in cookie and state
+    // Step 3: save in the cookies
     Cookies.set("jwt", jwt, { expires: 7 });
     Cookies.set("user", JSON.stringify(fullUser), { expires: 7 });
     setUser(fullUser);
@@ -50,12 +60,18 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (username, email, password) => {
-    const res = await api.post("/auth/local/register", {
-      username,
-      email,
-      password,
+    const res = await fetch(`${STRAPI_URL}/api/auth/local/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, email, password }),
     });
-    return res.data;
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw { response: { data: err } };
+    }
+
+    return await res.json();
   };
 
   return (
