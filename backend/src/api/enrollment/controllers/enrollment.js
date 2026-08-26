@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use strict";
 
 const { createCoreController } = require("@strapi/strapi").factories;
@@ -5,23 +6,28 @@ const { createCoreController } = require("@strapi/strapi").factories;
 module.exports = createCoreController(
   "api::enrollment.enrollment",
   ({ strapi }) => ({
-    // Student enroll to a course
     async create(ctx) {
       const user = ctx.state.user;
       if (!user) return ctx.unauthorized("You must be logged in");
 
       const { courseId } = ctx.request.body.data;
+      if (!courseId) return ctx.badRequest("courseId is required");
 
+      // Already enrolled check
       const existing = await strapi
         .documents("api::enrollment.enrollment")
         .findMany({
-          filters: { student: user.id, course: courseId },
+          filters: {
+            student: { id: user.id },
+            course: { documentId: courseId },
+          },
         });
 
       if (existing.length > 0) {
         return ctx.badRequest("Already enrolled in this course");
       }
 
+      // Enroll
       const enrollment = await strapi
         .documents("api::enrollment.enrollment")
         .create({
@@ -36,7 +42,6 @@ module.exports = createCoreController(
       return { data: enrollment };
     },
 
-    // Student's enrolled courses list
     async getMyCourses(ctx) {
       const user = ctx.state.user;
       if (!user) return ctx.unauthorized();
@@ -44,14 +49,15 @@ module.exports = createCoreController(
       const enrollments = await strapi
         .documents("api::enrollment.enrollment")
         .findMany({
-          filters: { student: user.id },
+          filters: {
+            student: { id: user.id },
+          },
           populate: ["course", "completed_lessons"],
         });
 
       return { data: enrollments };
     },
 
-    // Lesson complete mark
     async completeLesson(ctx) {
       const user = ctx.state.user;
       if (!user) return ctx.unauthorized();

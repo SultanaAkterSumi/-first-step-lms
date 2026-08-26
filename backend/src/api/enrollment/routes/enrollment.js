@@ -2,6 +2,20 @@
 
 module.exports = {
   routes: [
+    // Custom routes
+    {
+      method: "GET",
+      path: "/enrollments/my-courses",
+      handler: "enrollment.getMyCourses",
+      config: { policies: [] },
+    },
+    {
+      method: "POST",
+      path: "/enrollments/enroll",
+      handler: "enrollment.create",
+      config: { policies: [] },
+    },
+
     // Default routes
     {
       method: "GET",
@@ -19,20 +33,6 @@ module.exports = {
       method: "DELETE",
       path: "/enrollments/:id",
       handler: "enrollment.delete",
-      config: { policies: [] },
-    },
-
-    // Custom routes
-    {
-      method: "POST",
-      path: "/enrollments/enroll",
-      handler: "enrollment.create",
-      config: { policies: [] },
-    },
-    {
-      method: "GET",
-      path: "/enrollments/my-courses",
-      handler: "enrollment.getMyCourses",
       config: { policies: [] },
     },
     {
