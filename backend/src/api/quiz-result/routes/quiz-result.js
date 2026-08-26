@@ -1,9 +1,27 @@
-'use strict';
+"use strict";
 
-/**
- * quiz-result router
- */
+module.exports = {
+  routes: [
+    // Default routes
+    {
+      method: "GET",
+      path: "/quiz-results",
+      handler: "quiz-result.find",
+      config: { policies: [] },
+    },
+    {
+      method: "GET",
+      path: "/quiz-results/:id",
+      handler: "quiz-result.findOne",
+      config: { policies: [] },
+    },
 
-const { createCoreRouter } = require('@strapi/strapi').factories;
-
-module.exports = createCoreRouter('api::quiz-result.quiz-result');
+    // Custom route — quiz submit
+    {
+      method: "POST",
+      path: "/quiz-results/submit",
+      handler: "quiz-result.submitQuiz",
+      config: { policies: [] },
+    },
+  ],
+};
