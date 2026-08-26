@@ -15,19 +15,14 @@ export default function LoginPage() {
   const { login } = useAuth()
   const router = useRouter()
 
-  const handleLogin = async () => {
+const handleLogin = async () => {
     setError('')
     setLoading(true)
 
     try {
-      const user = await login(identifier, password)
-      const role = user.role?.type
-
-      if (role === 'admin') router.push('/dashboard/admin')
-      else if (role === 'instructor') router.push('/dashboard/instructor')
-      else if (role === 'content_manager') router.push('/dashboard/content-manager')
-      else if (role === 'student') router.push('/dashboard/student')
-      else router.push('/')
+      await login(identifier, password)
+      // Login -> Landing page 
+      router.push('/')
     } catch (err) {
       setError('Invalid email or password. Please try again.')
     } finally {
