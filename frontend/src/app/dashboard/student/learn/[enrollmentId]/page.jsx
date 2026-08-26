@@ -22,6 +22,7 @@ export default function LearnPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [marking, setMarking] = useState(false)
   const [fetching, setFetching] = useState(true)
+  const [quizResults, setQuizResults] = useState([])
 
   useEffect(() => {
     if (!loading && !user) router.push('/login')
@@ -41,8 +42,16 @@ export default function LearnPage() {
         const fetchedLessons = lessonsRes.data.data
         setLessons(fetchedLessons)
         if (fetchedLessons.length > 0) setSelectedLesson(fetchedLessons[0])
-        const quizzesRes = await api.get('/quizzes?filters[course][documentId][$eq]=' + courseId)
-        setQuizzes(quizzesRes.data.data)
+
+const quizzesRes = await api.get(
+  '/quizzes?filters[course][documentId][$eq]=' + courseId
+)
+setQuizzes(quizzesRes.data.data)
+
+// Quiz results 
+const resultsRes = await api.get('/quiz-results?populate=quiz')
+setQuizResults(resultsRes.data.data)
+
       } catch (err) {
         console.error(err)
       } finally {
@@ -146,19 +155,31 @@ export default function LearnPage() {
                 </div>
                 <nav className="space-y-1">
                   {quizzes.map((quiz) => {
-                    const isActive = selectedQuiz?.documentId === quiz.documentId
-                    return (
-                      <button key={quiz.documentId} type="button"
-                        onClick={() => { setSelectedQuiz(quiz); setSelectedLesson(null); setSidebarOpen(false) }}
-                        className={`flex w-full items-center gap-3 rounded-xl px-2.5 py-3 text-left transition ${isActive ? 'bg-primary/10 text-foreground ring-1 ring-primary/20' : 'text-muted-foreground hover:bg-card hover:text-foreground'}`}
-                      >
-                        <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-border text-muted-foreground">
-                          <FileQuestion className="size-3.5" />
-                        </span>
-                        <span className="block truncate text-sm font-medium">{quiz.title}</span>
-                      </button>
-                    )
-                  })}
+  const isActive = selectedQuiz?.documentId === quiz.documentId
+  const quizResult = quizResults.find(
+    r => r.quiz?.documentId === quiz.documentId
+  )
+  return (
+    <button
+      key={quiz.documentId}
+      type="button"
+      onClick={() => { setSelectedQuiz(quiz); setSelectedLesson(null); setSidebarOpen(false) }}
+      className={`flex w-full items-center gap-3 rounded-xl px-2.5 py-3 text-left transition ${isActive ? 'bg-primary/10 text-foreground ring-1 ring-primary/20' : 'text-muted-foreground hover:bg-card hover:text-foreground'}`}
+    >
+      <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-border text-muted-foreground">
+        <FileQuestion className="size-3.5" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-sm font-medium">{quiz.title}</span>
+        {quizResult && (
+          <span className="block text-xs text-primary mt-0.5">
+            Last score: {quizResult.score}%
+          </span>
+        )}
+      </span>
+    </button>
+  )
+})}
                 </nav>
               </section>
             )}

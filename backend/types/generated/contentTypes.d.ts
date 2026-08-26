@@ -632,7 +632,7 @@ export interface ApiQuizResultQuizResult extends Struct.CollectionTypeSchema {
     singularName: 'quiz-result';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     attempted_at: Schema.Attribute.DateTime;

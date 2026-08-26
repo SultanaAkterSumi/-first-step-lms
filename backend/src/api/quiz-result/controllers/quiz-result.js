@@ -59,6 +59,7 @@ module.exports = createCoreController(
             correct_answers: correct,
             total_questions: questions.length,
             attempted_at: new Date(),
+            publishedAt: new Date(),
           },
         });
       } else {
@@ -71,6 +72,7 @@ module.exports = createCoreController(
             correct_answers: correct,
             total_questions: questions.length,
             attempted_at: new Date(),
+            publishedAt: new Date(),
           },
         });
       }
