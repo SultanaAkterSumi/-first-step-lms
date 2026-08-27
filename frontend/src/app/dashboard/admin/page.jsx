@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -6,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
 import {
   BookOpen, ChevronDown, FileText, GraduationCap,
-  LayoutDashboard, LogOut, Menu, Search, UserRound, Users, X,
+  LayoutDashboard, LayoutGrid, LogOut, Menu, UserRound, Users, X,
 } from 'lucide-react'
 
 const tabs = [
@@ -35,7 +36,6 @@ const roleLabels = {
 export default function AdminDashboard() {
   const { user, logout, loading } = useAuth()
   const router = useRouter()
-
   const [activeTab, setActiveTab] = useState('Overview')
   const [mobileOpen, setMobileOpen] = useState(false)
   const [users, setUsers] = useState([])
@@ -85,9 +85,13 @@ export default function AdminDashboard() {
     }
   }
 
-  if (loading || fetching) return (
-    <div className="min-h-screen bg-background flex items-center justify-center text-foreground">Loading...</div>
-  )
+  if (loading || fetching) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center text-foreground">
+        Loading...
+      </div>
+    )
+  }
 
   const stats = {
     users: users.length,
@@ -98,8 +102,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-
-      {/* Navbar */}
       <header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-screen-xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <a href="/" className="flex items-center gap-3">
@@ -109,20 +111,22 @@ export default function AdminDashboard() {
             <span className="font-semibold tracking-tight">First Step</span>
             <span className="hidden border-l border-border pl-3 text-xs text-muted-foreground sm:inline">Admin</span>
           </a>
-
           <nav className="hidden items-center gap-1 md:flex">
-            {tabs.map(({ label, icon: Icon }) => (
-              <button
-                key={label}
-                type="button"
-                onClick={() => setActiveTab(label)}
-                className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors ${activeTab === label ? 'bg-primary/10 font-medium text-primary' : 'text-muted-foreground hover:bg-card hover:text-foreground'}`}
-              >
-                <Icon size={15} />{label}
-              </button>
-            ))}
+            {tabs.map(function(tab) {
+              const Icon = tab.icon
+              return (
+                <button
+                  key={tab.label}
+                  type="button"
+                  onClick={() => setActiveTab(tab.label)}
+                  className={'flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors ' + (activeTab === tab.label ? 'bg-primary/10 font-medium text-primary' : 'text-muted-foreground hover:bg-card hover:text-foreground')}
+                >
+                  <Icon size={15} />
+                  {tab.label}
+                </button>
+              )
+            })}
           </nav>
-
           <div className="flex items-center gap-3">
             <div className="hidden items-center gap-2 sm:flex">
               <span className="flex size-8 items-center justify-center rounded-full bg-card text-muted-foreground">
@@ -130,12 +134,20 @@ export default function AdminDashboard() {
               </span>
               <span className="text-sm font-medium">{user?.username}</span>
             </div>
+            
+             <a href="/dashboard/content-manager"
+              className="hidden items-center gap-2 rounded-md px-2.5 py-2 text-sm text-muted-foreground hover:bg-card hover:text-foreground sm:flex transition"
+            >
+              <LayoutGrid size={15} />
+              Manage Content
+            </a>
             <button
               type="button"
               onClick={handleLogout}
               className="hidden items-center gap-2 rounded-md px-2.5 py-2 text-sm text-muted-foreground hover:bg-card hover:text-foreground sm:flex transition"
             >
-              <LogOut size={15} /> Logout
+              <LogOut size={15} />
+              Logout
             </button>
             <button
               type="button"
@@ -146,26 +158,28 @@ export default function AdminDashboard() {
             </button>
           </div>
         </div>
-
         {mobileOpen && (
           <nav className="flex flex-col gap-1 border-t border-border px-4 py-3 md:hidden">
-            {tabs.map(({ label, icon: Icon }) => (
-              <button
-                key={label}
-                type="button"
-                onClick={() => { setActiveTab(label); setMobileOpen(false) }}
-                className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm ${activeTab === label ? 'bg-primary/10 font-medium text-primary' : 'text-muted-foreground'}`}
-              >
-                <Icon size={16} />{label}
-              </button>
-            ))}
+            {tabs.map(function(tab) {
+              const Icon = tab.icon
+              return (
+                <button
+                  key={tab.label}
+                  type="button"
+                  onClick={() => { setActiveTab(tab.label); setMobileOpen(false) }}
+                  className={'flex items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm ' + (activeTab === tab.label ? 'bg-primary/10 font-medium text-primary' : 'text-muted-foreground')}
+                >
+                  <Icon size={16} />
+                  {tab.label}
+                </button>
+              )
+            })}
           </nav>
         )}
       </header>
 
       <main className="mx-auto max-w-screen-xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
 
-        {/* Overview Tab */}
         {activeTab === 'Overview' && (
           <div className="flex flex-col gap-8">
             <div>
@@ -179,22 +193,24 @@ export default function AdminDashboard() {
                 { label: 'Total Courses', value: stats.courses, icon: BookOpen },
                 { label: 'Total Enrollments', value: stats.enrollments, icon: GraduationCap },
                 { label: 'Total Blog Posts', value: stats.posts, icon: FileText },
-              ].map(({ label, value, icon: Icon }) => (
-                <article key={label} className="flex min-h-32 flex-col justify-between rounded-xl border border-border bg-card p-5 hover:border-primary/40 transition">
-                  <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <Icon size={18} />
-                  </span>
-                  <div>
-                    <p className="text-2xl font-semibold tracking-tight">{value}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{label}</p>
-                  </div>
-                </article>
-              ))}
+              ].map(function(item) {
+                const Icon = item.icon
+                return (
+                  <article key={item.label} className="flex min-h-32 flex-col justify-between rounded-xl border border-border bg-card p-5 hover:border-primary/40 transition">
+                    <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <Icon size={18} />
+                    </span>
+                    <div>
+                      <p className="text-2xl font-semibold tracking-tight">{item.value}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{item.label}</p>
+                    </div>
+                  </article>
+                )
+              })}
             </div>
           </div>
         )}
 
-        {/* Users Tab */}
         {activeTab === 'Users' && (
           <div className="flex flex-col gap-8">
             <div>
@@ -213,33 +229,37 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {users.map((u) => (
-                      <tr key={u.id} className="hover:bg-background/40 transition">
-                        <td className="px-5 py-4">
-                          <p className="font-medium">{u.username}</p>
-                          <p className="mt-0.5 text-xs text-muted-foreground">{u.email}</p>
-                        </td>
-                        <td className="px-5 py-4">
-                          <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${roleStyles[u.role?.type] || ''}`}>
-                            {roleLabels[u.role?.type] || u.role?.name || 'Unknown'}
-                          </span>
-                        </td>
-                        <td className="px-5 py-4">
-                          <div className="relative w-44">
-                            <select
-                              value={u.role?.id || ''}
-                              onChange={(e) => handleRoleChange(u.id, e.target.value)}
-                              className="h-9 w-full appearance-none rounded-md border border-border bg-background px-3 pr-8 text-xs text-foreground outline-none focus:border-primary"
-                            >
-                              {roles.map(role => (
-                                <option key={role.id} value={role.id}>{role.name}</option>
-                              ))}
-                            </select>
-                            <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                    {users.map(function(u) {
+                      return (
+                        <tr key={u.id} className="hover:bg-background/40 transition">
+                          <td className="px-5 py-4">
+                            <p className="font-medium">{u.username}</p>
+                            <p className="mt-0.5 text-xs text-muted-foreground">{u.email}</p>
+                          </td>
+                          <td className="px-5 py-4">
+                            <span className={'inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ' + (roleStyles[u.role?.type] || '')}>
+                              {roleLabels[u.role?.type] || u.role?.name || 'Unknown'}
+                            </span>
+                          </td>
+                          <td className="px-5 py-4">
+                            <div className="relative w-44">
+                              <select
+                                value={u.role?.id || ''}
+                                onChange={(e) => handleRoleChange(u.id, e.target.value)}
+                                className="h-9 w-full appearance-none rounded-md border border-border bg-background px-3 pr-8 text-xs text-foreground outline-none focus:border-primary"
+                              >
+                                {roles.map(function(role) {
+                                  return (
+                                    <option key={role.id} value={role.id}>{role.name}</option>
+                                  )
+                                })}
+                              </select>
+                              <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -247,7 +267,6 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Courses Tab */}
         {activeTab === 'Courses' && (
           <div className="flex flex-col gap-8">
             <div>
@@ -266,17 +285,19 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {courses.map((course) => (
-                      <tr key={course.documentId} className="hover:bg-background/40">
-                        <td className="px-5 py-4 font-medium">{course.title}</td>
-                        <td className="px-5 py-4 text-muted-foreground">{course.instructor?.username || 'Unknown'}</td>
-                        <td className="px-5 py-4">
-                          <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${course.published ? 'bg-green-500/12 text-green-300' : 'bg-border text-muted-foreground'}`}>
-                            {course.published ? 'Published' : 'Draft'}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
+                    {courses.map(function(course) {
+                      return (
+                        <tr key={course.documentId} className="hover:bg-background/40">
+                          <td className="px-5 py-4 font-medium">{course.title}</td>
+                          <td className="px-5 py-4 text-muted-foreground">{course.instructor?.username || 'Unknown'}</td>
+                          <td className="px-5 py-4">
+                            <span className={'inline-flex rounded-full px-2.5 py-1 text-xs font-medium ' + (course.published ? 'bg-green-500/12 text-green-300' : 'bg-border text-muted-foreground')}>
+                              {course.published ? 'Published' : 'Draft'}
+                            </span>
+                          </td>
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -284,7 +305,6 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Blog Tab */}
         {activeTab === 'Blog' && (
           <div className="flex flex-col gap-8">
             <div>
@@ -304,20 +324,22 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {posts.map((post) => (
-                      <tr key={post.documentId} className="hover:bg-background/40">
-                        <td className="max-w-[300px] px-5 py-4 font-medium truncate">{post.title}</td>
-                        <td className="px-5 py-4 text-muted-foreground">{post.author?.username || 'Unknown'}</td>
-                        <td className="px-5 py-4">
-                          <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${post.post_status === 'published' ? 'bg-green-500/12 text-green-300' : 'bg-border text-muted-foreground'}`}>
-                            {post.post_status}
-                          </span>
-                        </td>
-                        <td className="px-5 py-4 font-mono text-xs text-muted-foreground">
-                          {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </td>
-                      </tr>
-                    ))}
+                    {posts.map(function(post) {
+                      return (
+                        <tr key={post.documentId} className="hover:bg-background/40">
+                          <td className="max-w-[300px] px-5 py-4 font-medium truncate">{post.title}</td>
+                          <td className="px-5 py-4 text-muted-foreground">{post.author?.username || 'Unknown'}</td>
+                          <td className="px-5 py-4">
+                            <span className={'inline-flex rounded-full px-2.5 py-1 text-xs font-medium ' + (post.post_status === 'published' ? 'bg-green-500/12 text-green-300' : 'bg-border text-muted-foreground')}>
+                              {post.post_status}
+                            </span>
+                          </td>
+                          <td className="px-5 py-4 font-mono text-xs text-muted-foreground">
+                            {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </td>
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>
