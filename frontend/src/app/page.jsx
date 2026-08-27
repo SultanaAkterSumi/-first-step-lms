@@ -23,15 +23,15 @@ export default function LandingPage() {
   const { user, logout } = useAuth()
   const router = useRouter()
 
-  // Real courses আনো
+  // Real courses 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const coursesRes = await api.get('/courses?pagination[limit]=3&populate=instructor')
         setCourses(coursesRes.data.data)
 
-        const blogsRes = await api.get('/blog-posts?filters[post_status][$eq]=published&pagination[limit]=2')
-        setBlogs(blogsRes.data.data)
+        const blogsRes = await api.get('/blog-posts?pagination[limit]=2')
+setBlogs(blogsRes.data.data)
       } catch (err) {
         console.error(err)
       }
