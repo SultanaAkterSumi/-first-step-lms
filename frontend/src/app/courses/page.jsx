@@ -37,7 +37,7 @@ export default function CoursesPage() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await api.get('/courses?populate=instructor')
+        const res = await api.get('/courses?filters[published][$eq]=true&populate=instructor')
         setCourses(res.data.data)
       } catch (err) {
         console.error('Failed to fetch courses:', err)

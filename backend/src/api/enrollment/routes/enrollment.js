@@ -5,6 +5,12 @@ module.exports = {
     // Custom routes
     {
       method: "GET",
+      path: "/enrollments/course/:courseId/students",
+      handler: "enrollment.getCourseStudents",
+      config: { policies: [] },
+    },
+    {
+      method: "GET",
       path: "/enrollments/my-courses",
       handler: "enrollment.getMyCourses",
       config: { policies: [] },

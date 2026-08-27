@@ -6,9 +6,19 @@ const { createCoreController } = require("@strapi/strapi").factories;
 module.exports = createCoreController("api::course.course", ({ strapi }) => ({
   // All courses with instructor
   async find(ctx) {
-    const courses = await strapi.documents("api::course.course").findMany({
+    const allCourses = await strapi.documents("api::course.course").findMany({
       populate: ["instructor"],
     });
+
+    // Frontend থেকে আসা published filter check করো
+    const publishedParam = ctx.query?.filters?.published?.["$eq"];
+
+    let courses = allCourses;
+    if (publishedParam === "true") {
+      courses = allCourses.filter((c) => c.published === true);
+    } else if (publishedParam === "false") {
+      courses = allCourses.filter((c) => c.published === false);
+    }
 
     const sanitized = courses.map((course) => {
       if (course.instructor) {
@@ -34,9 +44,15 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
 
     const coursesWithCount = await Promise.all(
       courses.map(async (course) => {
-        const lessons = await strapi.documents("api::lesson.lesson").findMany({
-          filters: { course: { documentId: course.documentId } },
+        const lessons = await strapi.db.query("api::lesson.lesson").findMany({
+          where: { course: { documentId: course.documentId } },
         });
+        console.log(
+          "Course:",
+          course.documentId,
+          "Lessons found:",
+          lessons.length,
+        );
         if (course.instructor) {
           delete course.instructor.password;
           delete course.instructor.resetPasswordToken;

@@ -27,7 +27,7 @@ export default function LandingPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const coursesRes = await api.get('/courses?pagination[limit]=3&populate=instructor')
+       const coursesRes = await api.get('/courses?filters[published][$eq]=true&pagination[limit]=3&populate=instructor')
         setCourses(coursesRes.data.data)
 
         const blogsRes = await api.get('/blog-posts?pagination[limit]=2')
@@ -39,7 +39,7 @@ setBlogs(blogsRes.data.data)
     fetchData()
   }, [])
 
-  // Role অনুযায়ী dashboard link
+  // Role wise dashboard link
   const getDashboardLink = () => {
     const role = user?.role?.type
     if (role === 'admin') return '/dashboard/admin'

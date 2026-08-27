@@ -487,7 +487,7 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
     singularName: 'course';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     cover_image_url: Schema.Attribute.String;
@@ -524,7 +524,7 @@ export interface ApiEnrollmentEnrollment extends Struct.CollectionTypeSchema {
     singularName: 'enrollment';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     completed_lessons: Schema.Attribute.Relation<

@@ -57,7 +57,28 @@ module.exports = createCoreController(
 
       return { data: enrollments };
     },
+    // Instructor এর course এর students
+    async getCourseStudents(ctx) {
+      const { courseId } = ctx.params;
 
+      const enrollments = await strapi
+        .documents("api::enrollment.enrollment")
+        .findMany({
+          filters: { course: { documentId: courseId } },
+          populate: ["student", "completed_lessons"],
+        });
+
+      const sanitized = enrollments.map((enrollment) => {
+        if (enrollment.student) {
+          delete enrollment.student.password;
+          delete enrollment.student.resetPasswordToken;
+          delete enrollment.student.confirmationToken;
+        }
+        return enrollment;
+      });
+
+      return { data: sanitized };
+    },
     async completeLesson(ctx) {
       const user = ctx.state.user;
       if (!user) return ctx.unauthorized();
