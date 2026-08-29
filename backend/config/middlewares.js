@@ -14,7 +14,13 @@ module.exports = [
   "strapi::poweredBy",
   "strapi::query",
   "strapi::body",
-  "strapi::session",
+  {
+    name: "strapi::session",
+    config: {
+      rolling: false,
+      secure: false,
+    },
+  },
   "strapi::favicon",
   "strapi::public",
 ];
