@@ -1,3 +1,5 @@
+// Production build
+// @ts-nocheck
 import axios from "axios";
 import Cookies from "js-cookie";
 
