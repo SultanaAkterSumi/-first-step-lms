@@ -6,18 +6,23 @@ module.exports = (plugin) => {
     await originalMe(ctx);
 
     if (ctx.body && ctx.body.id) {
-      const user = await strapi
-        .documents("plugin::users-permissions.user")
-        .findOne({
-          documentId: ctx.body.documentId,
-          populate: ["role"],
-        });
+      try {
+        const users = await strapi.db
+          .query("plugin::users-permissions.user")
+          .findMany({
+            where: { id: ctx.body.id },
+            populate: ["role"],
+          });
 
-      if (user) {
-        delete user.password;
-        delete user.resetPasswordToken;
-        delete user.confirmationToken;
-        ctx.body = user;
+        if (users && users[0]) {
+          const user = users[0];
+          delete user.password;
+          delete user.resetPasswordToken;
+          delete user.confirmationToken;
+          ctx.body = user;
+        }
+      } catch (err) {
+        console.error("Error populating role:", err);
       }
     }
   };
