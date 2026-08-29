@@ -5,7 +5,8 @@ import Cookies from "js-cookie";
 
 const AuthContext = createContext(null);
 
-const STRAPI_URL = "http://localhost:1337";
+// const STRAPI_URL = "http://localhost:1337";
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "https://first-step-lms-production.up.railway.app";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
