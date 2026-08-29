@@ -3,7 +3,9 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://first-step-lms-production.up.railway.app/api";
 
 const api = axios.create({
   baseURL: API_URL,
