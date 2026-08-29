@@ -1,7 +1,12 @@
 module.exports = [
   "strapi::logger",
   "strapi::errors",
-  "strapi::security",
+  {
+    name: "strapi::security",
+    config: {
+      contentSecurityPolicy: false,
+    },
+  },
   {
     name: "strapi::cors",
     config: {
@@ -19,6 +24,7 @@ module.exports = [
     config: {
       rolling: false,
       secure: false,
+      sameSite: "none",
     },
   },
   "strapi::favicon",
