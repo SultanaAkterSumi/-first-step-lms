@@ -119,18 +119,3 @@ NEXT_PUBLIC_API_URL=http://localhost:1337/api
 - **Frontend:** Vercel (connected to GitHub repo)
 - Environment variables configured in Railway and Vercel dashboards
 
----
-
-## Project Structure
-
-first-step-lms/
-├── backend/ # Strapi v5 backend
-│ ├── src/
-│ │ ├── api/ # Custom controllers and routes
-│ │ └── extensions/ # Strapi extensions
-│ └── config/ # Server, database, middleware config
-└── frontend/ # Next.js frontend
-└── src/
-├── app/ # Pages and routes
-├── context/ # Auth context
-└── lib/ # API utility
